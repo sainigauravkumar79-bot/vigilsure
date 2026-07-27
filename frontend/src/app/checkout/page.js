@@ -2,7 +2,7 @@
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { PayPalButtons } from '@paypal/react-paypal-js';
+import { PayPalButtons, FUNDING } from '@paypal/react-paypal-js';
 import axios from '@/lib/axios';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
@@ -80,7 +80,25 @@ function CheckoutForm() {
         {loading || processing ? (
           <div className="text-center py-4">{processing ? 'Processing...' : 'Creating order...'}</div>
         ) : plan && amount > 0 ? (
-          <PayPalButtons createOrder={createOrder} onApprove={onApprove} onCancel={() => { toast.error('Cancelled'); router.push('/pricing'); }} onError={() => toast.error('PayPal error')} style={{ layout: 'vertical', color: 'blue', shape: 'rect', label: 'paypal' }} />
+          <div className="space-y-3">
+            <PayPalButtons
+              fundingSource={FUNDING.PAYPAL}
+              createOrder={createOrder}
+              onApprove={onApprove}
+              onCancel={() => { toast.error('Cancelled'); router.push('/pricing'); }}
+              onError={() => toast.error('PayPal error')}
+              style={{ layout: 'vertical', color: 'blue', shape: 'rect', label: 'paypal' }}
+            />
+            <PayPalButtons
+              fundingSource={FUNDING.CARD}
+              createOrder={createOrder}
+              onApprove={onApprove}
+              onCancel={() => { toast.error('Cancelled'); router.push('/pricing'); }}
+              onError={() => toast.error('Card payment error')}
+              style={{ layout: 'vertical', color: 'black', shape: 'rect', label: 'pay' }}
+            />
+            <p className="text-center text-xs text-gray-400">"Debit or Credit Card" lets you pay without a PayPal account — Visa, Mastercard, Amex and more, accepted internationally.</p>
+          </div>
         ) : (
           <div className="text-center py-4 text-red-500">No plan selected. <Link href="/pricing" className="text-primary hover:underline">Go back</Link></div>
         )}
@@ -96,4 +114,4 @@ export default function CheckoutPage() {
       <CheckoutForm />
     </Suspense>
   );
-          }
+                }
